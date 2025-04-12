@@ -30,6 +30,7 @@ from someipy._internal.someip_sd_extractors import (
     extract_offered_services,
     extract_subscribe_eventgroup_entries,
     extract_subscribe_ack_eventgroup_entries,
+    extract_subscribe_nack_eventgroup_entries,
 )
 from someipy._internal.session_handler import SessionHandler
 from someipy._internal.utils import (
@@ -160,6 +161,11 @@ class ServiceDiscoveryProtocol(ServiceDiscoverySubject, ServiceDiscoverySender):
         ):
             self._handle_subscribe_ack_eventgroup_entry(event_group_entry)
 
+        for event_group_entry in extract_subscribe_nack_eventgroup_entries(
+            someip_sd_header
+        ):
+            self._handle_subscribe_nack_eventgroup_entry(event_group_entry)
+
     def connection_lost(self, exc: Exception) -> None:
         """
         Handle connection lost.
@@ -259,6 +265,18 @@ class ServiceDiscoveryProtocol(ServiceDiscoverySubject, ServiceDiscoverySender):
         )
         for o in self.attached_observers:
             o.handle_subscribe_ack_eventgroup(event_group_entry)
+    
+    def _handle_subscribe_nack_eventgroup_entry(
+        self, event_group_entry: SdEventGroupEntry
+    ) -> None:
+        """
+        Handle a subscribe NACK event group entry.
+        """
+        get_logger(_logger_name).warning(
+            f"Received subscribe NACK for instance 0x{event_group_entry.sd_entry.instance_id:04X}, service 0x{event_group_entry.sd_entry.service_id:04X}, eventgroup 0x{event_group_entry.eventgroup_id:04X}"
+        )
+        # for o in self.attached_observers:
+            # o.handle_subscribe_nack_eventgroup(event_group_entry)
 
 
 async def construct_service_discovery(
