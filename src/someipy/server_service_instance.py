@@ -384,8 +384,8 @@ class ServerServiceInstance(ServiceDiscoveryObserver):
         service_to_offer = SdService(
             service_id=self._service.id,
             instance_id=self._instance_id,
-            major_version=1,
-            minor_version=0,
+            major_version=self._service.major_version,
+            minor_version=self._service.minor_version,
             ttl=self._ttl,
             endpoint=self._endpoint,
             protocol=self._protocol,
